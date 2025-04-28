@@ -1,0 +1,278 @@
+id: TEST-00001
+name: Supply Chain Compromise Detection Test Runbook
+version: 1
+date: '2025-02-27'
+author: Fulcrum Technology Solutions
+status: Draft
+last_updated: '2025-02-27'
+review_date: '2025-05-27'  # Next required review
+
+# Overview Section
+overview:
+  summary: >-
+    This test runbook provides structured methodologies for validating detection 
+    capabilities related to supply chain compromises through software updates. 
+    It enables security teams to safely simulate various aspects of these attacks 
+    to ensure detection mechanisms function as expected.
+  
+  objective: >-
+    Validate the effectiveness of detection rules, alert fidelity, and response 
+    procedures related to supply chain compromises without introducing actual risk 
+    to production environments.
+
+# Test Environment Requirements
+environment:
+  infrastructure:
+    - name: Isolated Test Network
+      type: virtual
+      specifications: |
+        * Segmented virtual network with no connection to production
+        * Minimum 5 virtual machines (1 update server, 4 client systems)
+        * OS Version: Windows Server 2022 (update server), Windows 11/10 (clients)
+        * Memory: 4GB minimum per system
+        * Storage: 100GB minimum
+        * Network: Fully isolated test VLAN with monitoring capability
+
+    - name: Log Collection Infrastructure
+      type: virtual
+      specifications: |
+        * SIEM test instance or collector
+        * EDR test console
+        * Network traffic capture capability
+        * Log forwarding configured identically to production
+
+  tools:
+    - name: Atomic Red Team
+      version: "Latest"
+      purpose: Execute test techniques
+      link: https://github.com/redcanaryco/atomic-red-team
+    
+    - name: Caldera
+      version: "Latest"
+      purpose: Orchestrate multi-stage attack scenarios
+      link: https://github.com/mitre/caldera
+    
+    - name: Custom Test Harness
+      version: "Latest"
+      purpose: Simulate software update behavior
+      link: https://internal-tools/update-simulator
+
+  data_requirements:
+    - name: Software Update Test Package
+      description: Benign package that mimics legitimate software update
+      source: Created using package manipulation tools
+    
+    - name: Historical Alert Baseline
+      description: Collection of historical true positive alerts for comparison
+      source: Production SIEM archive (anonymized)
+
+# Test Procedure
+procedure:
+  pre_test_setup: |
+    ### Environment Preparation
+    1. Verify test environment isolation
+       ```bash
+       # Validate network segmentation
+       ping -c 3 prod-server-1
+       # Should return no response
+       ```
+    
+    2. Configure software update infrastructure
+       ```bash
+       # Set up update server
+       ./setup_update_server.sh
+       # Configure client systems to use test update server
+       ./configure_clients.sh
+       ```
+    
+    3. Verify logging and monitoring
+       ```bash
+       # Validate log forwarding
+       ./test_log_forwarding.sh
+       # Confirm EDR connectivity
+       ./validate_edr_connectivity.sh
+       ```
+    
+    4. Create baseline measurements
+       ```bash
+       # Record normal update behavior
+       ./capture_baseline_update.sh
+       ```
+
+  test_execution: |
+    ### Test Steps
+    1. Update Server Compromise Simulation
+       * Simulate attacker access to update infrastructure
+       * Modify update package with benign test code
+       * Deploy modified update to test clients
+       ```bash
+       # Compromise update server
+       ./simulate_server_compromise.sh
+       # Create modified update package
+       ./create_test_package.sh --simulate-backdoor
+       # Deploy update to clients
+       ./deploy_test_update.sh
+       ```
+    
+    2. Post-Update Behavior Simulation
+       * Execute benign commands that mimic malicious post-update behavior
+       * Simulate command and control communications
+       * Perform mock data exfiltration
+       ```bash
+       # Execute post-update behaviors
+       ./simulate_post_update_behavior.sh --c2-simulation
+       # Perform mock lateral movement
+       ./simulate_lateral_movement.sh
+       # Simulate data exfiltration
+       ./mock_data_exfil.sh --size 10MB
+       ```
+    
+    3. Alert Verification
+       * Check SIEM for triggered alerts
+       * Verify EDR detection of suspicious behaviors
+       * Validate network traffic alerts
+       ```bash
+       # Query SIEM for alerts
+       ./check_siem_alerts.sh --timeframe "last 1 hour"
+       # Verify EDR detections
+       ./query_edr_alerts.sh
+       ```
+
+
+  test_cases:
+    positive_tests: |
+      ### True Positive Validation
+      1. Test Case: Basic Supply Chain Compromise
+         * Deploy modified update with command execution
+         * Execute benign post-update network connections
+         ```bash
+         # Execute test case
+         ./run_supply_chain_test.sh --scenario basic
+         ```
+         **Expected Result**: DET-SC001 alert triggered within 10 minutes
+      
+      2. Test Case: Advanced Persistence Mechanism
+         * Deploy update with simulated persistence technique
+         * Execute delayed command execution after update
+         ```bash
+         # Execute test case
+         ./run_supply_chain_test.sh --scenario advanced
+         ```
+         **Expected Result**: DET-SC001 alert triggered, persistence mechanism identified
+      
+      3. Test Case: Data Exfiltration Simulation
+         * Deploy update with benign file access capability
+         * Simulate sensitive data gathering and exfiltration
+         ```bash
+         # Execute test case
+         ./run_supply_chain_test.sh --scenario exfil
+         ```
+         **Expected Result**: DET-SC001 alert with data exfiltration indicators
+
+    negative_tests: |
+      ### False Positive Validation
+      1. Test Case: Legitimate Update with Network Activity
+         * Deploy genuine update with expected post-update behavior
+         * System connects to legitimate vendor domains
+         ```bash
+         # Execute test case
+         ./run_legitimate_update.sh --vendor microsoft
+         ```
+         **Expected Result**: No DET-SC001 alert generated
+      
+      2. Test Case: Post-Update Verification
+         * Update includes legitimate checksum verification
+         * Connections to expected CDNs and verification servers
+         ```bash
+         # Execute test case
+         ./run_legitimate_update.sh --verification-heavy
+         ```
+         **Expected Result**: No DET-SC001 alert generated
+      
+      3. Test Case: Multiple Simultaneous Updates
+         * Multiple systems performing legitimate updates concurrently
+         * High volume of update traffic across network
+         ```bash
+         # Execute test case
+         ./run_mass_update_test.sh
+         ```
+         **Expected Result**: No DET-SC001 alert generated despite high update volume
+
+    performance_tests: |
+      ### Performance Validation
+      1. High Volume Test
+         * Generate 100+ legitimate update events
+         * Intersperse 5 simulated malicious updates
+         ```bash
+         # Execute test case
+         ./run_volume_test.sh --legitimate 100 --malicious 5
+         ```
+         **Expected Result**: All 5 malicious updates detected, no false positives
+      
+      2. Detection Time Test
+         * Measure time between simulated compromise and alert generation
+         * Test across different system loads
+         ```bash
+         # Execute test case
+         ./run_timing_test.sh --iterations 10
+         ```
+         **Expected Result**: Average detection time under 5 minutes
+
+# Validation Criteria
+validation:
+  success_criteria: |
+    ### Required Outcomes
+    - [ ] All true positive test cases detected (100% detection rate)
+    - [ ] False positive rate below 5% for negative test cases
+    - [ ] Average detection time under 5 minutes
+    - [ ] Alert details provide sufficient information for triage
+    - [ ] Response runbook actions can be completed successfully
+    
+    | Metric | Requirement | Actual |
+    |--------|------------|--------|
+    | Detection Rate | 100% | |
+    | False Positive Rate | <5% | |
+    | Avg. Detection Time | <5 min | |
+    | Alert Quality Score | >85% | |
+
+  data_validation: |
+    ### Alert Field Validation
+    | Field | Validation Criteria |
+    |-------|-------------------|
+    | timestamp | Within 60 seconds of event |
+    | affected_host | Correctly identified |
+    | process_name | Properly captured |
+    | network_destination | Accurately recorded |
+    | severity | Appropriately set based on activity |
+
+# Troubleshooting
+troubleshooting:
+  common_issues: |
+    ### Known Issues and Solutions
+    1. Issue: Test update packages not properly detected
+       * Solution: Verify that the simulated malicious behaviors are sufficiently similar to real-world techniques
+       * Verification: Review detection rules and adjust test parameters
+    
+    2. Issue: False positives in negative testing
+       * Solution: Tune detection thresholds based on test results
+       * Verification: Re-run negative tests after tuning
+    
+    3. Issue: Logging pipeline delays
+       * Solution: Check log forwarding configuration and latency
+       * Verification: `tail -f /var/log/test-simulator.log`
+
+# References
+references:
+  - name: MITRE ATT&CK T1195.002 - Supply Chain Compromise
+    url: https://attack.mitre.org/techniques/T1195/002/
+    description: MITRE ATT&CK technique description for software supply chain compromise
+  - name: CISA Testing Guidance for Supply Chain Security
+    url: https://www.cisa.gov/supply-chain-testing
+    description: CISA guidelines for testing supply chain security controls
+  - name: NIST SP 800-161 - Supply Chain Risk Management Testing
+    url: https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final
+    description: NIST guidelines for testing supply chain security
+
+# Tags
+tags:
+  type: Integration Test

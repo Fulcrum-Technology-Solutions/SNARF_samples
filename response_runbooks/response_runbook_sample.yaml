@@ -1,0 +1,128 @@
+id: RUN-XXXXX
+name: SOC Runbook Name Here
+version: 1
+date: 'YYYY-MM-DD'
+author: Author Name, Organization
+status: Draft | Review | Approved | Deprecated
+last_updated: 'YYYY-MM-DD'
+review_date: 'YYYY-MM-DD'  # Next required review
+
+# Overview Section
+overview:
+  summary: >-
+    Brief description of what this runbook is for and when it 
+    should be used.
+  
+  objective: >-
+    Clear statement of what this runbook will accomplish when 
+    completed.
+  
+  trigger_conditions:
+    - Condition 1 that triggers this runbook
+    - Condition 2 that triggers this runbook
+  
+  severity_matrix: |
+    | Severity | Conditions |
+    |----------|------------|
+    | High     | - Condition 1<br/>- Condition 2 |
+    | Medium   | - Condition 3<br/>- Condition 4 |
+    | Low      | - Condition 5<br/>- Condition 6 |
+
+# Prerequisites Section
+prerequisites:
+  required_access:
+    - System 1 with access level  
+  required_tools:
+    - name: Tool Name
+      version: "x.y.z"
+      purpose: Brief description of why this tool is needed
+  required_knowledge:
+    - Knowledge area 1
+    - Knowledge area 2
+
+# Procedure Section
+procedure:
+  pre_steps: |
+    ### Before You Begin
+    1. Verify access to required systems
+    2. Check preconditions ...
+
+  investigation_steps: |
+    ### Investigation Process
+    1. First step
+       * Sub-step details
+    
+    2. Second step
+       * Details about step 2
+       > Important note about this step
+
+  decision_points: |
+    ### Decision Matrix
+    1. If condition A:
+       - Take action X
+       - Document findings
+    2. If condition B:
+       - Take action Y
+       - Escalate to L2
+
+  escalation_criteria: |
+    ### Escalation Guidelines
+    * Escalate to L2 if:
+      - Condition 1 is met
+      - Condition 2 is observed
+
+# Documentation Requirements
+documentation:
+  required_artifacts:
+    - Screenshot of alert
+    - Timeline of events
+    - Actions taken
+  
+  ticket_template: |
+    ### Incident Ticket Template
+    **Incident ID**: ${incident_id}
+    **Severity**: ${severity}
+    **Detection Source**: ${source}
+    
+    #### Initial Findings
+    ${initial_findings}
+    
+    #### Actions Taken
+    ${actions_taken}
+    
+    #### Results
+    ${results}
+
+# References
+references:
+  - name: Reference Technical Documentation
+    url: https://example.com/reference
+    description: URL to relevant technical documentation
+  - name: Reference Research
+    url: https://example.com/threat
+    description: URL to related threat research
+  - name: Reference Example Technique
+    url: https://example.com/technique
+    description: URL to example attack/technique
+
+# Metrics & KPIs
+metrics:
+  success_criteria:
+    - "Resolution within SLA"
+    - "Proper documentation completed"
+    - "Required artifacts collected"
+  
+  time_tracking:
+    expected_completion_time: 2h
+    sla_requirements: |
+      | Severity | Response Time | Resolution Time |
+      |----------|--------------|-----------------|
+      | High     | 15m          | 2h             |
+      | Medium   | 30m          | 4h             |
+      | Low      | 1h           | 8h             |
+
+# Tags
+tags:
+  type: Incident Reponse | Investigation | Enrichment | Triage
+  priority: P1 | P2 | P3 | P4
+  skill_level: L1 | L2 | L3

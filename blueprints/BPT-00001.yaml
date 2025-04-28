@@ -1,0 +1,79 @@
+id: BPT-00001
+name: Supply Chain Attack Through Compromised Software Updates
+version: 1
+date: '2025-02-17'
+author: Fulcrum Technology Solutions
+status: Draft
+last_updated: '2025-04-27'
+
+description: >-
+  This blueprint addresses the threat of supply chain attacks through compromised software updates.
+  Threat actors target software vendors and compromise their build or distribution infrastructure to
+  inject malicious code into legitimate software updates. When organizations install these
+  compromised updates, backdoors or other malware are deployed across their environments,
+  giving attackers persistent access to victim networks at scale.
+
+narrative: >-
+ Supply chain attacks targeting software update mechanisms represent a sophisticated 
+ threat vector that has evolved significantly in recent years. These attacks exploit the 
+ trust relationship between software vendors and their customers, allowing attackers to 
+ bypass traditional security controls by leveraging legitimate software distribution channels.
+ 
+ Historically, supply chain attacks were relatively rare due to the resources and access 
+ required. However, the SolarWinds incident in 2020 demonstrated that sophisticated threat 
+ actors are willing to invest significant resources into these operations due to their 
+ high-impact potential. The attack involved compromising SolarWinds' build infrastructure to 
+ inject malicious code into Orion software updates, affecting approximately 18,000 organizations.
+ 
+ The technical execution of these attacks typically involves:
+ 1. Initial compromise of the vendor's development or build environment
+ 2. Injection of malicious code into the software before compilation/building
+ 3. Bypassing code signing or other integrity verification mechanisms
+ 4. Distribution through legitimate update channels
+ 5. Post-compromise activities leveraging the backdoored software
+ 
+ The impact on organizations can be severe, including:
+ - Widespread unauthorized access across entire networks
+ - Data exfiltration of sensitive information
+ - Deployment of additional malware
+ - Lateral movement to high-value systems
+ - Potential for persistent access over extended periods
+ 
+ The current threat landscape shows an increase in supply chain attacks, with both 
+ nation-state actors and criminal groups adopting these techniques. Notable examples 
+ beyond SolarWinds include the Kaseya VSA attack, NotPetya distribution via compromised 
+ MeDoc updates, and the CCleaner compromise.
+ 
+ Recommended defensive strategies include:
+ - Implementing vendor security assessment processes
+ - Deploying software update integrity verification
+ - Establishing network segmentation for update servers
+ - Implementing application allowlisting
+ - Employing behavior-based detection for post-compromise activities
+ - Developing incident response plans specific to supply chain compromises
+ - Creating an inventory of critical software and dependencies
+
+references:
+  - name: CISA Alert AA20-352A - APT Compromise of Government Agencies
+    url: https://www.cisa.gov/news-events/cybersecurity-advisories/aa20-352a
+    description: CISA advisory on the SolarWinds supply chain compromise
+  - name: NIST SP 800-161 - Supply Chain Risk Management Practices
+    url: https://csrc.nist.gov/publications/detail/sp/800-161/rev-1/final
+    description: NIST guidelines for managing supply chain security risks
+  - name: MITRE ATT&CK - Supply Chain Compromise
+    url: https://attack.mitre.org/techniques/T1195/
+    description: MITRE ATT&CK technique description for supply chain compromise
+    
+tags:
+  category:
+    - Supply Chain Attack
+    - Backdoor
+    - Persistent Access
+  product:
+    - Enterprise Software
+    - Security Tools
+    - Management Platforms
+  usecase:
+    - Threat Detection
+    - Incident Response
+    - Threat Hunting

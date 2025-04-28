@@ -1,0 +1,45 @@
+id: BPT-XXXXX  # Unique identifier for the blueprint
+name: Blueprint Name
+version: 1
+date: 'YYYY-MM-DD'
+author: Author Name, Organization
+status: Draft | Review | Approved | Deprecated
+last_updated: 'YYYY-MM-DD'
+
+description: >-
+  Detailed description of the security threat or scenario this 
+  blueprint addresses.
+  Include key characteristics, behavior patterns, and potential 
+  impact.
+
+narrative: >-
+ Comprehensive narrative explaining the threat, including:
+ - Historical context and evolution
+ - Technical details of attack methods
+ - Impact on organizations
+ - Current threat landscape
+ - Recommended defensive strategies
+
+references:
+  - name: Reference Technical Documentation
+    url: https://example.com/reference
+    description: URL to relevant technical documentation
+  - name: Reference Research
+    url: https://example.com/threat
+    description: URL to related threat research
+  - name: Reference Example Technique
+    url: https://example.com/technique
+    description: URL to example attack/technique
+    
+tags:
+  category:
+    - Malware
+    - Ransomware
+    - Data Exfiltration
+  product:
+    - Product Name 1
+    - Product Name 2
+  usecase:
+    - Threat Detection
+    - Incident Response
+    - Threat Hunting

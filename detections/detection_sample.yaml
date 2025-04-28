@@ -1,0 +1,100 @@
+id: DET-XXXXX
+name: Detection Name Here
+version: 1
+date: 'YYYY-MM-DD'
+author: Author Name, Organization, Additional Contributors
+status: Draft | Review | Approved | Deprecated
+type: TTP | Anomaly | Hunting | Correlation
+description: >-
+  Provide a detailed description of what this detection does 
+  and why it matters. Include:
+  - What behavior/activity is being detected
+  - How the detection works at a high level
+  - Why this activity is significant
+  - What the potential impact could be if detected activity is 
+  confirmed malicious
+
+# Blueprints
+blueprints:
+  - BPT-XXXXX
+  - BPT-XXXXX
+
+# Response Runbooks
+response_runbooks:
+  primary_runbook: RUN-XXXXX
+  primary_soar_playbook: SOAR-XXXXX
+  secondary_runbooks:
+    - RUN-XXXXX
+    - RUN-XXXXX
+
+# Testing Runbooks
+testing_runbooks:
+  primary_runbook: TEST-XXXXX
+  secondary_runbooks:
+    - TEST-XXXXX
+    - TEST-XXXXX
+
+# Sigma rule definition
+sigma_rule:
+  level: informational | low | medium | high | critical
+  logsource:
+    product: windows | linux | macos
+
+# Product-specific queries
+queries:
+  splunk:
+    spl: >-
+  elasticsearch:
+    kql: >-
+
+data_source:
+  - Primary Data Source 1 (e.g., Sysmon EventID X)
+  - Primary Data Source 2 (e.g., Windows Event Log)
+  - EDR/XDR Platform Name
+
+how_to_implement: >-
+  Detailed implementation instructions including:
+  - Required data sources and log types
+  - Data ingestion requirements
+  - Data model mapping instructions
+  - Required technology add-ons or apps
+  - Additional configuration steps
+  - Platform-specific considerations for each query type
+
+known_false_positives: >-
+  List known legitimate activities that might trigger this 
+  detection.
+  Provide guidance on how to identify true vs false positives.
+
+# References
+references:
+  - name: Reference Technical Documentation
+    url: https://example.com/reference
+    description: URL to relevant technical documentation
+  - name: Reference Research
+    url: https://example.com/threat
+    description: URL to related threat research
+
+tags:
+  asset_type: Endpoint | Network | Cloud | Application
+  confidence: 0-100
+  impact: 0-100
+  message: "Alert message template with $variables$ for key 
+  fields"
+  mitre_attack_id:
+    - TXXXX.XXX
+    - TXXXX
+  observable:
+    - name: field_name
+      type: Field Type (User, Endpoint, Process, etc)
+      role:
+        - Victim | Attacker | Target
+  product:
+    - Product Name 1
+    - Product Name 2
+  required_fields:
+    - field1
+    - field2.subfield
+    - field3
+  risk_score: 0-100
+  security_domain: Endpoint | Network | Cloud | Application

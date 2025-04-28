@@ -1,0 +1,83 @@
+id: SOAR-XXXXX
+name: SOAR Playbook Name
+version: 1
+date: 'YYYY-MM-DD'
+author: Author Name, Security Team
+status: Draft | Review | Approved | Deprecated
+last_updated: 'YYYY-MM-DD'
+review_date: 'YYYY-MM-DD'  # Next required review
+
+# Overview
+overview:
+  description: >-
+    Detailed description of what this playbook does and its 
+    purpose in the security operations workflow.
+  
+  trigger_events:
+    - Alert type or condition that triggers this playbook
+    - System or data source generating the trigger
+    - Threshold or criteria details
+
+# Integration Requirements
+integrations:
+  required_tools:
+    - name: Security Tool Name
+      version: "x.y.z"
+      purpose: Specific function this tool serves in the playbook
+    
+  data_sources:
+    - name: Data Source Name
+      type: SIEM | EDR | Threat Intel
+      required_fields:
+        - field1
+        - field2
+
+# Documentation
+documentation:
+  logging_requirements:
+    - Timestamp of all actions
+    - Tool outputs and results
+    - Analyst decisions and rationale
+  
+  reporting_template: |
+    ### Incident Report
+    **Playbook ID**: ${playbook_id}
+    **Trigger Event**: ${trigger}
+    **Execution Time**: ${execution_time}
+    
+    #### Actions Executed
+    ${actions_summary}
+    
+    #### Findings
+    ${findings}
+    
+    #### Recommendations
+    ${recommendations}
+
+    - Tool capability changes
+    - Process improvements
+
+# References
+references:
+  - name: Reference Technical Documentation
+    url: https://example.com/reference
+    description: URL to relevant technical documentation
+  - name: Reference Research
+    url: https://example.com/threat
+    description: URL to related threat research
+  - name: Reference Example Technique
+    url: https://example.com/technique
+    description: URL to example attack/technique
+
+# Maintenance
+maintenance:
+  update_triggers:
+    - New threat intelligence
+    - Tool capability changes
+    - Process improvements
+
+# Tags
+tags:
+  type: Detection | Response | Enrichment | Containment | Recovery
+  automation_level: Full | Partial | Manual
+  estimated_runtime: 5m | 15m | 30m | 1h

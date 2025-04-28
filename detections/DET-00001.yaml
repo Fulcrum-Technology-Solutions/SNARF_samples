@@ -1,0 +1,124 @@
+id: DET-00001
+name: Anomalous Behavior Following Software Update
+version: 1
+date: '2025-02-17'
+author: Fulcrum Technology Solutions
+status: Draft
+type: TTP
+description: >-
+  This detection identifies suspicious post-update behaviors that may indicate
+  a compromised software supply chain. It focuses on detecting unusual network
+  connections, process execution patterns, and file system activities that occur
+  immediately following a legitimate software update. These behaviors may indicate
+  that a trusted update channel has been compromised to deliver malicious payloads,
+  potentially leading to data exfiltration, lateral movement, or persistent access
+  to critical systems across the enterprise.
+
+# Blueprints
+blueprints:
+  - BPT-00001
+
+# Response Runbooks
+response_runbooks:
+  primary_runbook: RUN-00001
+  primary_soar_playbook: SOAR-00001
+  secondary_runbooks:
+    - RUN-00002
+    - RUN-00003
+
+# Testing Runbooks
+testing_runbooks:
+  primary_runbook: TEST-00001
+  secondary_runbooks:
+    - TEST-00002
+    - TEST-00003
+
+# Sigma rule definition
+sigma_rule:
+  level: high
+  logsource:
+    product: windows
+
+# Product-specific queries
+queries:
+  splunk:
+    spl: >-
+      index=windows sourcetype=WinEventLog:System EventCode=19 (Service="UpdateService" OR "AutomaticUpdates") 
+      | transaction startswith=EventCode=19 endswith=EventCode=7045 maxspan=5m 
+      | search [search index=network sourcetype=firewall_logs dest_ip!=10.0.0.0/8 dest_ip!=172.16.0.0/12 dest_ip!=192.168.0.0/16 
+      | stats count by src_ip | where count > 10] 
+      | table _time host EventCode Service CommandLine DestinationIP DestinationPort
+  elasticsearch:
+    kql: >-
+      (winlog.event_id:19 AND (winlog.event_data.Service:"UpdateService" OR winlog.event_data.Service:"AutomaticUpdates")) 
+      AND WITHIN_TIME(5m, winlog.event_id:7045) 
+      AND source.ip:* AND NOT destination.ip:(10.0.0.0/8 OR 172.16.0.0/12 OR 192.168.0.0/16) 
+      AND destination.count:>10
+
+data_source:
+  - Windows Event Logs (System, Security)
+  - Sysmon EventID 1, 3, 11
+  - Endpoint Detection and Response (EDR) Platforms
+  - Network Firewall/Proxy Logs
+
+how_to_implement: >-
+  To implement this detection effectively:
+  - Ensure Windows event logging is enabled with System and Security logs collected
+  - Deploy Sysmon with at minimum EventIDs 1 (process creation), 3 (network connections),
+    and 11 (file creation) configured
+  - Configure your SIEM to correlate software update events with subsequent network,
+    process, and file system activities
+  - Establish baselines for normal post-update behaviors for each software in your environment
+  - Map the detection to your MITRE ATT&CK framework for better threat coverage visibility
+  - Consider implementing specific update server monitoring to detect tampering with
+    update packages or unauthorized modifications
+  - For EDR platforms, use APIs to query for similar process relationships and network activities
+
+known_false_positives: >-
+  This detection may generate false positives in the following scenarios:
+  - Legitimate software updates that include new features requiring additional network connectivity
+  - Software that performs expected post-update verification or telemetry activities
+  - Update services that download additional components after the initial update
+  - Automated software testing tools running after updates
+  - To reduce false positives, baseline normal post-update behavior for each application
+    and enhance the detection with allowlisted destinations and processes associated with
+    legitimate update procedures.
+
+# References
+references:
+  - name: CISA Supply Chain Compromise Detection
+    url: https://www.cisa.gov/supply-chain-compromise
+    description: Detection guidance for identifying supply chain compromises
+  - name: Microsoft Threat Protection - Solorigate Resource Center
+    url: https://www.microsoft.com/security/blog/2021/01/20/deep-dive-into-the-solorigate-second-stage-activation/
+    description: Technical analysis of SolarWinds attack post-compromise indicators
+
+tags:
+  asset_type: Endpoint
+  confidence: 70
+  impact: 90
+  message: "Potential supply chain compromise detected on $host$ following software update from $update_source$"
+  mitre_attack_id:
+    - T1195.002
+    - T1059.001
+  observable:
+    - name: host
+      type: Endpoint
+      role:
+        - Victim
+    - name: process_name
+      type: Process
+      role:
+        - Attacker
+  product:
+    - EDR Platforms
+    - SIEM Solutions
+    - Network Monitoring Tools
+  required_fields:
+    - host
+    - process_name
+    - process_command_line
+    - destination_ip
+    - destination_port
+  risk_score: 85
+  security_domain: Endpoint

@@ -1,0 +1,233 @@
+id: SOAR-00001
+name: Supply Chain Compromise Automated Response
+version: 1
+date: '2025-02-17'
+author: Fulcrum Technology Solutions Security Team
+status: Draft
+last_updated: '2025-02-17'
+review_date: '2025-05-27'  # Next required review
+
+# Overview
+overview:
+  description: >-
+    This SOAR playbook automates the initial response to suspected supply chain 
+    compromises through software updates. It coordinates data collection, 
+    containment actions, and enrichment processes across multiple security tools
+    to accelerate response and minimize impact. This playbook is designed to work
+    in conjunction with human analysts following RUN-00001 procedures.
+  
+  trigger_events:
+    - Alert from DET-00001 (Anomalous Behavior Following Software Update)
+    - Multiple systems exhibiting similar post-update network connections
+    - Threat intelligence feed match for known supply chain compromise indicators
+    - Vendor notification via API or email about compromised updates
+
+# Integration Requirements
+integrations:
+  required_tools:
+    - name: EDR Platform
+      version: "Current"
+      purpose: Host isolation and evidence collection
+    - name: SIEM Solution
+      version: "Current"
+      purpose: Alert correlation and log analysis
+    - name: Threat Intelligence Platform
+      version: "Current"
+      purpose: Indicator enrichment and context
+    - name: Network Monitoring Tool
+      version: "Current"
+      purpose: Traffic analysis and connection blocking
+    - name: IT Service Management
+      version: "Current"
+      purpose: Ticket creation and workflow management
+    
+  data_sources:
+    - name: EDR Telemetry
+      type: EDR
+      required_fields:
+        - hostname
+        - process_name
+        - process_command_line
+        - parent_process
+        - network_connections
+    - name: Network Logs
+      type: SIEM
+      required_fields:
+        - src_ip
+        - dst_ip
+        - dst_port
+        - protocol
+        - bytes_transferred
+    - name: Software Inventory
+      type: Asset Management
+      required_fields:
+        - hostname
+        - software_name
+        - software_version
+        - installation_date
+        - update_history
+
+# Playbook Steps
+steps:
+  - name: Initial Triage
+    description: Gather and correlate data to validate the alert
+    automated_actions:
+      - action: Query EDR for affected system details
+        parameters:
+          query_type: system_info
+          time_range: 24h
+      - action: Get software update history
+        parameters:
+          system: ${affected_host}
+          time_range: 7d
+      - action: Check for similar alerts
+        parameters:
+          alert_type: DET-00001
+          time_range: 7d
+          
+  - name: Scope Assessment
+    description: Identify all potentially affected systems
+    automated_actions:
+      - action: Query asset inventory
+        parameters:
+          software_name: ${affected_software}
+          software_version: ${affected_version}
+      - action: Check for similar network connections
+        parameters:
+          destination_ip: ${suspicious_ip}
+          destination_port: ${suspicious_port}
+          time_range: 24h
+      - action: Create dynamic watchlist
+        parameters:
+          name: "Potentially_Affected_Systems_${incident_id}"
+          criteria: "Software=${affected_software} AND Version=${affected_version}"
+          
+  - name: Evidence Collection
+    description: Gather forensic evidence from affected systems
+    automated_actions:
+      - action: Collect process memory dump
+        parameters:
+          hostname: ${affected_host}
+          process_name: ${suspicious_process}
+      - action: Capture system timeline
+        parameters:
+          hostname: ${affected_host}
+          time_range: 7d
+      - action: Export network connections
+        parameters:
+          hostname: ${affected_host}
+          time_range: 7d
+      - action: Archive update package
+        parameters:
+          software_name: ${affected_software}
+          version: ${affected_version}
+          
+  - name: Containment
+    description: Apply containment measures to limit impact
+    automated_actions:
+      - action: Network isolation
+        parameters:
+          hostname: ${affected_host}
+          isolation_level: "allow_security_tools"
+          approver: ${security_lead}
+      - action: Block suspicious connections
+        parameters:
+          destination_ip: ${suspicious_ip}
+          destination_port: ${suspicious_port}
+      - action: Add to EDR blocklist
+        parameters:
+          hash: ${suspicious_file_hash}
+          
+  - name: Enrichment
+    description: Gather additional context about the incident
+    automated_actions:
+      - action: Query threat intelligence
+        parameters:
+          ioc_type: ip
+          ioc_value: ${suspicious_ip}
+      - action: Query threat intelligence
+        parameters:
+          ioc_type: file_hash
+          ioc_value: ${suspicious_file_hash}
+      - action: Check vendor advisory
+        parameters:
+          vendor_name: ${software_vendor}
+          software_name: ${affected_software}
+          
+  - name: Notification
+    description: Alert appropriate stakeholders
+    automated_actions:
+      - action: Create incident ticket
+        parameters:
+          ticket_type: security_incident
+          severity: ${alert_severity}
+          title: "Potential Supply Chain Compromise - ${affected_software}"
+      - action: Notify security team
+        parameters:
+          channel: security_incidents
+          message: "Potential supply chain compromise detected. Incident: ${incident_id}"
+      - action: Escalate to IR team
+        parameters:
+          team: incident_response
+          severity: ${alert_severity}
+          details: ${incident_summary}
+
+# Documentation
+documentation:
+  logging_requirements:
+    - Timestamp of all automated actions
+    - Success/failure status of each action
+    - Evidence collection details and storage locations
+    - Containment measures applied
+    - Systems affected
+  
+  reporting_template: |
+    ### Automated Response Summary
+    **Playbook ID**: SOAR-00001
+    **Trigger Event**: ${trigger_event}
+    **Incident ID**: ${incident_id}
+    **Execution Time**: ${execution_time}
+    
+    #### Systems Affected
+    ${affected_systems_count} systems identified
+    Key systems: ${key_systems_list}
+    
+    #### Actions Executed
+    - Evidence Collection: ${evidence_collection_status}
+    - Containment Actions: ${containment_status}
+    - Enrichment Results: ${enrichment_status}
+    
+    #### Key Findings
+    ${key_findings}
+    
+    #### Pending Actions
+    ${pending_actions}
+    
+    #### Next Steps for Analysts
+    ${analyst_recommendations}
+
+# References
+references:
+  - name: CISA Automated Response to Supply Chain Incidents
+    url: https://www.cisa.gov/automated-incident-response
+    description: CISA guidance for automated incident response
+  - name: SANS SOAR Implementation for Supply Chain Security
+    url: https://www.sans.org/white-papers/soar-supply-chain
+    description: SANS guidance on SOAR implementation
+  - name: NIST SP 800-61 - Computer Security Incident Handling Guide
+    url: https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+    description: NIST guidelines for incident response
+
+# Maintenance
+maintenance:
+  update_triggers:
+    - New supply chain compromise TTPs identified
+    - Tool capability changes
+    - Lessons learned from actual incidents
+    - Quarterly review cycle
+
+# Tags
+tags:
+  type: Response
+  automation_level: Partial
+  estimated_runtime: 30m

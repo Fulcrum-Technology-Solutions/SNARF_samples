@@ -1,0 +1,205 @@
+id: RUN-00001
+name: Supply Chain Compromise Response Runbook
+version: 1
+date: '2025-02-17'
+author: Fulcrum Technology Solutions
+status: Draft
+last_updated: '2025-02-17'
+review_date: '2025-05-27'  # Next required review
+
+# Overview Section
+overview:
+  summary: >-
+    This runbook provides structured guidance for responding to potential 
+    supply chain compromises involving trusted software update channels. 
+    It should be initiated when detection systems identify suspicious 
+    behaviors following software updates or when external threat intelligence 
+    indicates a possible compromise of a vendor's update infrastructure.
+  
+  objective: >-
+    Identify affected systems, contain the compromise, eradicate malicious 
+    components, recover normal operations, and gather evidence for further 
+    analysis while minimizing business impact.
+  
+  trigger_conditions:
+    - Alert from DET-00001 (Anomalous Behavior Following Software Update)
+    - External notification from vendor about compromise
+    - Threat intelligence indicating compromise of software in your environment
+    - Multiple systems exhibiting similar suspicious behaviors after updates
+  
+  severity_matrix: |
+    | Severity | Conditions |
+    |----------|------------|
+    | High     | - Critical infrastructure affected<br/>- Evidence of active data exfiltration<br/>- Sensitive data/systems impacted |
+    | Medium   | - Limited scope of affected systems<br/>- No evidence of data exfiltration<br/>- Non-critical systems affected |
+    | Low      | - Isolated incident<br/>- Update can be rolled back easily<br/>- No suspicious post-compromise activity observed |
+
+# Prerequisites Section
+prerequisites:
+  required_access:
+    - SIEM platform with admin access
+    - EDR/XDR console with response capabilities
+    - Asset inventory system
+    - Software management platform
+    - Network monitoring tools
+  
+  required_tools:
+    - name: Isolation tooling
+      version: "Current"
+      purpose: Ability to isolate affected systems from network
+    - name: Forensic toolkit
+      version: "Current"
+      purpose: Memory and disk acquisition for affected systems
+    - name: Network monitoring tools
+      version: "Current"
+      purpose: Identify command and control or data exfiltration
+  
+  required_knowledge:
+    - Normal network and system behavior baselines
+    - Software update infrastructure architecture
+    - Incident response procedures
+    - Digital forensics techniques
+
+# Procedure Section
+procedure:
+  pre_steps: |
+    ### Before You Begin
+    1. Verify alert fidelity and review detection details
+    2. Establish an incident response bridge/call
+    3. Create incident ticket in tracking system
+    4. Notify incident response team members
+    5. Identify potentially affected software and systems
+
+  investigation_steps: |
+    ### Investigation Process
+    1. Triage and Scoping
+       * Identify all systems with the affected software installed
+       * Determine when updates were applied across the environment
+       * Establish a timeline of suspicious activities
+       * Assess the potential scope of compromise
+    
+    2. Evidence Collection
+       * Acquire memory samples from representative affected systems
+       * Collect relevant logs (EDR, Windows Event, network)
+       * Capture network traffic from affected systems
+       * Preserve update package for analysis if available
+       > Important: Preserve forensic evidence before containment actions
+    
+    3. Analysis
+       * Examine collected evidence for indicators of compromise
+       * Identify any post-compromise activities (lateral movement, data exfiltration)
+       * Analyze update package for malicious components
+       * Compare observed behaviors with known supply chain TTPs
+    
+    4. Determine Impact
+       * Identify sensitive data potentially accessed
+       * Evaluate business impact of affected systems
+       * Assess likelihood of persistent access mechanisms
+       * Determine regulatory reporting requirements
+
+  decision_points: |
+    ### Decision Matrix
+    1. If malicious activity confirmed:
+       - Implement full containment measures
+       - Escalate to senior leadership
+       - Consider external incident response assistance
+       - Proceed to eradication phase
+    
+    2. If indicators inconclusive:
+       - Implement precautionary containment
+       - Continue evidence gathering
+       - Expand scope of investigation
+       - Consider vendor notification
+    
+    3. If false positive confirmed:
+       - Document findings
+       - Tune detection rule
+       - Return systems to normal operations
+       - Close incident
+
+  escalation_criteria: |
+    ### Escalation Guidelines
+    * Escalate to CISO and Legal if:
+      - Confirmed data exfiltration
+      - Critical systems compromised
+      - Potential regulatory reporting required
+      - Multiple customers/partners potentially affected
+    
+    * Escalate to external IR team if:
+      - Internal resources insufficient
+      - Sophisticated adversary techniques observed
+      - Widespread compromise detected
+      - Nation-state indicators present
+
+# Documentation Requirements
+documentation:
+  required_artifacts:
+    - Memory dumps from affected systems
+    - Network capture files
+    - EDR timeline exports
+    - Software update package
+    - Command history from affected systems
+    - System logs showing malicious activity
+  
+  ticket_template: |
+    ### Supply Chain Compromise Incident Ticket
+    **Incident ID**: ${incident_id}
+    **Severity**: ${severity}
+    **Detection Source**: ${source}
+    **Affected Software**: ${software_name} (Version: ${software_version})
+    **Update Date/Time**: ${update_datetime}
+    
+    #### Initial Findings
+    ${initial_findings}
+    
+    #### Affected Systems
+    ${affected_systems_count} systems identified
+    Key systems: ${key_systems_affected}
+    
+    #### Actions Taken
+    ${actions_taken}
+    
+    #### Indicators of Compromise
+    ${iocs_identified}
+    
+    #### Results
+    ${results}
+    
+    #### Recommendations
+    ${recommendations}
+
+# References
+references:
+  - name: CISA Supply Chain Compromise Response Guidance
+    url: https://www.cisa.gov/supply-chain-incident-response
+    description: CISA guidance for responding to supply chain incidents
+  - name: NIST SP 800-61 - Computer Security Incident Handling Guide
+    url: https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+    description: NIST guidelines for incident response
+  - name: SANS Incident Response Playbook for Supply Chain Attacks
+    url: https://www.sans.org/white-papers/supply-chain-response/
+    description: SANS playbook for responding to supply chain compromises
+
+# Metrics & KPIs
+metrics:
+  success_criteria:
+    - "All affected systems identified and remediated"
+    - "Root cause identified"
+    - "No evidence of persistent access"
+    - "Business operations restored"
+    - "Lessons learned documented"
+  
+  time_tracking:
+    expected_completion_time: 72h
+    sla_requirements: |
+      | Severity | Response Time | Containment Time | Eradication Time |
+      |----------|--------------|------------------|------------------|
+      | High     | 30m          | 4h               | 48h              |
+      | Medium   | 2h           | 8h               | 72h              |
+      | Low      | 8h           | 24h              | 96h              |
+
+# Tags
+tags:
+  type: Incident Response
+  priority: P1
+  skill_level: L3
